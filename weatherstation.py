@@ -3,7 +3,7 @@ import math
 from time import sleep
 from gpiozero import DigitalInputDevice
 from w1thermsensor import W1ThermSensor
-from flask import Flask
+from flask import Flask, request
 
 app = Flask(__name__)
 
