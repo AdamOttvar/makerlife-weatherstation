@@ -53,7 +53,7 @@ def rain():
     rainfall = (bucket_count * BUCKET_SIZE - BUCKET_SIZE)
 
 @app.route('/')
-@app.route('/index', methods=['POST'])
+@app.route('/index', methods=['GET','POST'])
 def index():
     global rainfall
 
