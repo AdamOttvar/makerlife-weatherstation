@@ -80,6 +80,4 @@ if __name__ == '__main__':
     wind_speed_sensor.when_activated = spin
     rain_sensor.when_activated = rain
 
-    app.run()
-
-#pipenv run python weatherstation.py
+    app.run(host='0.0.0.0')
