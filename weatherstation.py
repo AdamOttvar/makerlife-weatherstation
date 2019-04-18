@@ -58,7 +58,7 @@ def index():
     global rainfall
 
     if request.method == 'POST':
-        rainfall = 12
+        rainfall = 0
 
     temp = sensor.get_temperature()
     return '''
