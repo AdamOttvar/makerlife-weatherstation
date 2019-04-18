@@ -53,9 +53,12 @@ def rain():
     rainfall = (bucket_count * BUCKET_SIZE - BUCKET_SIZE)
 
 @app.route('/')
-@app.route('/index')
+@app.route('/index', methods=['POST'])
 def index():
     global rainfall
+
+    if request.method == 'POST':
+        rainfall = 12
 
     temp = sensor.get_temperature()
     return '''
@@ -67,16 +70,11 @@ def index():
                     <h1>Temperaturen: ''' + str(temp) + ''' grader</h1>
                     <h1>Det blåser: ''' + str(wind) + ''' m/s</h1>
                     <h1>Det har regnat: ''' + str(rainfall) + ''' mm</h1>
-                    <form action="/reset/" method="post">
+                    <form action="/" method="post">
                         <button name="resetBtn" type="submit">Återställ</button>
                     </form>
                 </body>
             </html>'''
-
-@app.route("/reset/", methods=['POST'])
-def move_forward():
-    global rainfall
-    rainfall = 12
 
 
 if __name__ == '__main__':
