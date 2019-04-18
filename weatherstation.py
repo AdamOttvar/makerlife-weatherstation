@@ -65,13 +65,13 @@ def index():
                 </head>
                 <body>
                     <h1>Temperaturen: ''' + str(temp) + ''' grader</h1>
-                    <h1>Det blåser: ''' + str(4) + ''' m/s</h1>
+                    <h1>Det blåser: ''' + str(wind) + ''' m/s</h1>
                     <h1>Det har regnat: ''' + str(rainfall) + ''' mm</h1>
                 </body>
             </html>'''
 
 if __name__ == '__main__':
-    windspeed = threading.Thread(name='wind', target=wind(interval))
+    windspeed = threading.Thread(name='wind', target=wind)
     raindata = threading.Thread(name='rain', target=rain)
 
     windspeed.start()
