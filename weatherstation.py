@@ -3,7 +3,7 @@ import math
 from time import sleep
 from gpiozero import DigitalInputDevice
 from w1thermsensor import W1ThermSensor
-from flask import Flask, request
+from flask import Flask, request, render_template
 
 app = Flask(__name__)
 
@@ -61,20 +61,7 @@ def index():
         rainfall = 0
 
     temp = sensor.get_temperature()
-    return '''
-            <html>
-                <head>
-                    <title>Väder Lilla Havedal</title>
-                </head>
-                <body>
-                    <h1>Temperaturen: ''' + str(temp) + ''' grader</h1>
-                    <h1>Det blåser: ''' + str(wind) + ''' m/s</h1>
-                    <h1>Det har regnat: ''' + str(rainfall) + ''' mm</h1>
-                    <form action="/" method="post">
-                        <button name="resetBtn" type="submit">Återställ</button>
-                    </form>
-                </body>
-            </html>'''
+    return render_template('index.html', temp = temp, wind = wind, rainfall = rainfall)
 
 
 if __name__ == '__main__':
