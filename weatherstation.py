@@ -37,7 +37,7 @@ def wind():
 
         m_per_sec = dist_m / wind_time
 
-        wind = m_per_sec * ADJUSTMENT
+        wind = round(m_per_sec * ADJUSTMENT, 1)
 
         sleep(wind_time)
  
@@ -50,7 +50,7 @@ def rain():
     global rainfall 
     global bucket_count
     bucket_count = bucket_count + 1
-    rainfall = (bucket_count * BUCKET_SIZE - BUCKET_SIZE)
+    rainfall = round(bucket_count * BUCKET_SIZE - BUCKET_SIZE, 1)
 
 @app.route('/', methods=['GET','POST'])
 @app.route('/index', methods=['GET','POST'])
@@ -60,7 +60,7 @@ def index():
     if request.method == 'POST':
         rainfall = 0
 
-    temp = sensor.get_temperature()
+    temp = round(sensor.get_temperature(), 1)
     return render_template('index.html', temp = temp, wind = wind, rainfall = rainfall)
 
 
