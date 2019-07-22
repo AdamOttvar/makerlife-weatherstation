@@ -1,15 +1,16 @@
 <html>
     <head>
         <title>Väder Lilla Havedal</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     </head>
     <body>
-        <center>
-        <h1>Temperaturen: {{ temp }} grader</h1>
-        <h1>Det blåser: {{ wind }} m/s</h1>
-        <h1>Det har regnat: {{ rainfall }} mm</h1>
-        <form action="/" method="post">
-            <button name="resetBtn" type="submit">Återställ</button>
-        </form>
-    </center>
+        <div class="content">
+            <h2>Temperaturen: </h2><h1>{{ temp }} grader</h1>
+            <h2>Det blåser: </h2><h1>{{ wind }} m/s</h1>
+            <h2>Det har regnat: </h2><h1>{{ rainfall }} mm</h1>
+            <form action="/" method="post">
+                <button class="resetBtn" name="resetBtn" type="submit">Återställ</button>
+            </form>
+        </div>
     </body>
 </html>
