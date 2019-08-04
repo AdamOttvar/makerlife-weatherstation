@@ -9,8 +9,8 @@ app = Flask(__name__)
 
 temp_max = -999.9
 temp_min = 999.9
-rainfall = 0
-wind = 0
+rainfall_glob = 0
+wind_glob = 0
 wind_count = 0
 bucket_count = 0
 radius_cm = 9.0
@@ -34,15 +34,14 @@ def init_logging():
     threading.Timer(10.0, log_values).start()
 
 def log_values():
-    global temp_max, temp_min
     temp = round(sensor.get_temperature(), 1)
     with open(logfile, "a") as text_file:
-        text_file.write("{}, {}, {}, {}\n".format(strftime("%Y-%m-%d %H:%M:%S", localtime()), temp, wind, rainfall))
+        text_file.write("{}, {}, {}, {}\n".format(strftime("%Y-%m-%d %H:%M:%S", localtime()), temp, wind_glob, rainfall_glob))
     # Call the log function every n:th second
     threading.Timer(600.0, log_values).start()
 
 def wind():
-    global wind
+    global wind_glob
     global wind_count
     wind_time = 5
     while True:
@@ -54,7 +53,7 @@ def wind():
 
         m_per_sec = dist_m / wind_time
 
-        wind = round(m_per_sec * ADJUSTMENT, 1)
+        wind_glob = round(m_per_sec * ADJUSTMENT, 1)
 
         sleep(wind_time)
  
@@ -64,27 +63,27 @@ def spin():
     wind_count = wind_count + 1
  
 def rain():
-    global rainfall 
+    global rainfall_glob
     global bucket_count
     bucket_count = bucket_count + 1
-    rainfall = round(bucket_count * BUCKET_SIZE - BUCKET_SIZE, 1)
+    rainfall_glob = round(bucket_count * BUCKET_SIZE - BUCKET_SIZE, 1)
 
 @app.route('/', methods=['GET','POST'])
 @app.route('/index', methods=['GET','POST'])
 def index():
-    global rainfall
-    global wind
+    global rainfall_glob
+    global temp_max, temp_min
 
     temp = round(sensor.get_temperature(), 1)
 
     if request.method == 'POST':
-        rainfall = 0
+        rainfall_glob = 0
         temp_max = temp
         temp_min = temp
 
     temp_max = max(temp_max, temp)
     temp_min = min(temp_min, temp)
-    return render_template('index.html', temp = temp, wind = wind, rainfall = rainfall, temp_max = temp_max, temp_min = temp_min)
+    return render_template('index.html', temp = temp, wind = wind_glob, rainfall = rainfall_glob, temp_max = temp_max, temp_min = temp_min)
 
 
 if __name__ == '__main__':
