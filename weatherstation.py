@@ -1,12 +1,14 @@
 import threading
 import math
-from time import sleep
+from time import sleep, localtime, strftime
 from gpiozero import DigitalInputDevice
 from w1thermsensor import W1ThermSensor
 from flask import Flask, request, render_template
 
 app = Flask(__name__)
 
+temp_max = -999.9
+temp_min = 999.9
 rainfall = 0
 wind = 0
 wind_count = 0
@@ -23,6 +25,21 @@ sensor = W1ThermSensor()
 wind_speed_sensor = DigitalInputDevice(17, pull_up=True)
 rain_sensor = DigitalInputDevice(27, pull_up=True)
 
+logfile = "log.txt"
+
+def init_logging():
+    with open(logfile, "w") as text_file:
+        text_file.write("### Starting to log {} ###\n".format(strftime("%Y-%m-%d %H:%M:%S", localtime())))
+        text_file.write("### {}, {}, {}, {} ###\n".format("Time", "Temp", "Wind", "Rain"))
+    threading.Timer(10.0, log_values).start()
+
+def log_values():
+    global temp_max, temp_min
+    temp = round(sensor.get_temperature(), 1)
+    with open(logfile, "a") as text_file:
+        text_file.write("{}, {}, {}, {}\n".format(strftime("%Y-%m-%d %H:%M:%S", localtime()), temp, wind, rainfall))
+    # Call the log function every n:th second
+    threading.Timer(600.0, log_values).start()
 
 def wind():
     global wind
@@ -56,12 +73,17 @@ def rain():
 @app.route('/index', methods=['GET','POST'])
 def index():
     global rainfall
+    global wind
 
     if request.method == 'POST':
         rainfall = 0
+        temp_max = temp
+        temp_min = temp
 
     temp = round(sensor.get_temperature(), 1)
-    return render_template('index.html', temp = temp, wind = wind, rainfall = rainfall)
+    temp_max = max(temp_max, temp)
+    temp_min = min(temp_min, temp)
+    return render_template('index.html', temp = temp, wind = wind, rainfall = rainfall, temp_max = temp_max, temp_min = temp_min)
 
 
 if __name__ == '__main__':
@@ -73,5 +95,8 @@ if __name__ == '__main__':
 
     wind_speed_sensor.when_activated = spin
     rain_sensor.when_activated = rain
+
+    # To start logging values
+    #init_logging()
 
     app.run(host='0.0.0.0')
