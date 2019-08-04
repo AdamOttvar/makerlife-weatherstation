@@ -27,6 +27,15 @@ h2 {
   letter-spacing: -2px;
 }
 
+h3 {
+  font-size: 1.5em;
+  margin-top: -5px;
+  margin-bottom: 10px;
+  text-align: center;
+  letter-spacing: -2px;
+  color: #666;
+}
+
 .resetBtn {
   -moz-box-shadow:inset 0px 1px 3px 0px #91b8b3;
   -webkit-box-shadow:inset 0px 1px 3px 0px #91b8b3;
