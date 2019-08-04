@@ -75,12 +75,13 @@ def index():
     global rainfall
     global wind
 
+    temp = round(sensor.get_temperature(), 1)
+
     if request.method == 'POST':
         rainfall = 0
         temp_max = temp
         temp_min = temp
 
-    temp = round(sensor.get_temperature(), 1)
     temp_max = max(temp_max, temp)
     temp_min = min(temp_min, temp)
     return render_template('index.html', temp = temp, wind = wind, rainfall = rainfall, temp_max = temp_max, temp_min = temp_min)

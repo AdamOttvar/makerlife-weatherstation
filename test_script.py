@@ -24,6 +24,8 @@ def index():
         temp_max = temp
         temp_min = temp
 
+    temp_max = max(temp_max, temp)
+    temp_min = min(temp_min, temp)
     return render_template('index.html', temp = temp, wind = wind, rainfall = rainfall, temp_max = temp_max, temp_min = temp_min)
 
 def init_logging():
@@ -35,8 +37,6 @@ def init_logging():
 def log_values():
     global temp_max, temp_min
     temp = round(23.6578443333, 1)
-    temp_max = max(temp_max, temp)
-    temp_min = min(temp_min, temp)
     with open(logfile, "a") as text_file:
         text_file.write("{}, {}, {}, {}\n".format(strftime("%Y-%m-%d %H:%M:%S", localtime()), temp, wind, rainfall))
     # Call the log function every n:th second
@@ -45,6 +45,6 @@ def log_values():
 if __name__ == '__main__':
 
     # To start logging values
-    init_logging()
+    #init_logging()
 
     app.run(host='0.0.0.0')
