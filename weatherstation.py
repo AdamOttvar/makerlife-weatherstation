@@ -4,7 +4,7 @@ import math
 from time import sleep, localtime, strftime
 from gpiozero import DigitalInputDevice
 from w1thermsensor import W1ThermSensor
-from flask import Flask, request, render_template, flash, session
+from flask import Flask, request, render_template, flash, session, redirect, url_for
 from passlib.hash import sha256_crypt
 
 app = Flask(__name__)
@@ -48,14 +48,12 @@ def do_admin_login():
             session['logged_in'] = True
         else:
             print("Wrong credentials entered")
-
-    elif request.form['password'] == 'password' and request.form['username'] == 'admin':
-        session['logged_in'] = True
+            flash('Fel användarnamn/lösenord')
     
     else:
         flash('wrong password!')
     
-    return index()
+    return redirect(url_for('index'))
 
 @app.route('/', methods=['GET','POST'])
 @app.route('/index', methods=['GET','POST'])

@@ -2,7 +2,7 @@ import os
 import threading
 import math
 from time import sleep, localtime, strftime
-from flask import Flask, request, render_template, flash, session
+from flask import Flask, request, render_template, flash, session, redirect, url_for
 from passlib.hash import sha256_crypt
 
 # dummy hash for 'admin' and 'password'
@@ -33,14 +33,12 @@ def do_admin_login():
             session['logged_in'] = True
         else:
             print("Wrong credentials entered")
-
-    elif request.form['password'] == 'password' and request.form['username'] == 'admin':
-        session['logged_in'] = True
+            flash('Fel användarnamn/lösenord')
     
     else:
-        flash('wrong password!')
+        flash('Something went wrong')
     
-    return index()
+    return redirect(url_for('index'))
 
 @app.route('/', methods=['GET','POST'])
 @app.route('/index', methods=['GET','POST'])
