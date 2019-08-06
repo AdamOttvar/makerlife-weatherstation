@@ -1,9 +1,11 @@
+import os
 import threading
 import math
 from time import sleep, localtime, strftime
 from gpiozero import DigitalInputDevice
 from w1thermsensor import W1ThermSensor
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, flash, session
+from passlib.hash import sha256_crypt
 
 app = Flask(__name__)
 
@@ -26,6 +28,55 @@ wind_speed_sensor = DigitalInputDevice(17, pull_up=True)
 rain_sensor = DigitalInputDevice(27, pull_up=True)
 
 logfile = "log.txt"
+
+# dummy hash for 'admin' and 'password'
+username_hash = '$5$rounds=535000$CWrew0XEF3Z2MHZV$5ly.8fTwUhxW48rrp70NVw.TIdV0X.jZVwGCErlsRq5'
+password_hash = '$5$rounds=535000$pE43ViC/UiLBakSo$0HXlVz5HO3thZ1y3Jf8QDX7YE4GeVEW49Wae8z2m.SB'
+
+@app.route('/login', methods=['POST'])
+def do_admin_login():
+    if request.method == 'POST' and 'resetBtn' in request.form:
+        reset_values()
+    
+    elif request.method == 'POST' and 'updateBtn' in request.form:
+        index()
+    
+    elif request.method == 'POST' and 'loginBtn' in request.form:
+        username_correct = sha256_crypt.verify(request.form['username'], username_hash)
+        password_correct = sha256_crypt.verify(request.form['password'], password_hash)
+        if username_correct  and password_correct:
+            session['logged_in'] = True
+        else:
+            print("Wrong credentials entered")
+
+    elif request.form['password'] == 'password' and request.form['username'] == 'admin':
+        session['logged_in'] = True
+    
+    else:
+        flash('wrong password!')
+    
+    return index()
+
+@app.route('/', methods=['GET','POST'])
+@app.route('/index', methods=['GET','POST'])
+def index():
+    if not session.get('logged_in'):
+        return render_template('login.html')
+    else:
+        global temp_max, temp_min
+
+        temp = round(sensor.get_temperature(), 1)
+
+        temp_max = max(temp_max, temp)
+        temp_min = min(temp_min, temp)
+        return render_template('index.html', temp = temp, wind = wind_glob, rainfall = rainfall_glob, temp_max = temp_max, temp_min = temp_min)
+
+def reset_values():
+    global rainfall, temp_max, temp_min
+    temp = round(23.6578443333, 1)
+    rainfall = 0
+    temp_max = temp
+    temp_min = temp
 
 def init_logging():
     with open(logfile, "w") as text_file:
@@ -57,7 +108,6 @@ def wind():
 
         sleep(wind_time)
  
-
 def spin():
     global wind_count
     wind_count = wind_count + 1
@@ -67,23 +117,6 @@ def rain():
     global bucket_count
     bucket_count = bucket_count + 1
     rainfall_glob = round(bucket_count * BUCKET_SIZE - BUCKET_SIZE, 1)
-
-@app.route('/', methods=['GET','POST'])
-@app.route('/index', methods=['GET','POST'])
-def index():
-    global rainfall_glob
-    global temp_max, temp_min
-
-    temp = round(sensor.get_temperature(), 1)
-
-    if request.method == 'POST':
-        rainfall_glob = 0
-        temp_max = temp
-        temp_min = temp
-
-    temp_max = max(temp_max, temp)
-    temp_min = min(temp_min, temp)
-    return render_template('index.html', temp = temp, wind = wind_glob, rainfall = rainfall_glob, temp_max = temp_max, temp_min = temp_min)
 
 
 if __name__ == '__main__':
@@ -99,4 +132,5 @@ if __name__ == '__main__':
     # To start logging values
     #init_logging()
 
+    app.secret_key = os.urandom(12)
     app.run(host='0.0.0.0')
