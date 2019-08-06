@@ -71,7 +71,7 @@ def index():
 
 def reset_values():
     global rainfall, temp_max, temp_min
-    temp = round(23.6578443333, 1)
+    temp = round(sensor.get_temperature(), 1)
     rainfall = 0
     temp_max = temp
     temp_min = temp
