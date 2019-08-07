@@ -70,9 +70,9 @@ def index():
         return render_template('index.html', temp = temp, wind = wind_glob, rainfall = rainfall_glob, temp_max = temp_max, temp_min = temp_min)
 
 def reset_values():
-    global rainfall, temp_max, temp_min
+    global rainfall_glob, temp_max, temp_min
     temp = round(sensor.get_temperature(), 1)
-    rainfall = 0
+    rainfall_glob = 0
     temp_max = temp
     temp_min = temp
 
