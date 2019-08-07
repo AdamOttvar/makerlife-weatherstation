@@ -51,7 +51,7 @@ def do_admin_login():
             flash('Fel användarnamn/lösenord')
     
     else:
-        flash('wrong password!')
+        flash('Something went wrong')
     
     return redirect(url_for('index'))
 
@@ -75,6 +75,13 @@ def reset_values():
     rainfall = 0
     temp_max = temp
     temp_min = temp
+
+def update_temperatures():
+    global temp_max, temp_min
+    temp = round(sensor.get_temperature(), 1)
+    temp_max = max(temp_max, temp)
+    temp_min = min(temp_min, temp)
+    threading.Timer(60.0, update_temperatures).start()
 
 def init_logging():
     with open(logfile, "w") as text_file:
@@ -130,5 +137,6 @@ if __name__ == '__main__':
     # To start logging values
     #init_logging()
 
+    threading.Timer(10.0, update_temperatures).start()
     app.secret_key = os.urandom(12)
     app.run(host='0.0.0.0')
